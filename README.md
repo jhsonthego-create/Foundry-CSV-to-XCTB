@@ -1,6 +1,7 @@
-Radio Foundry DM32UV Zip Export to M XCTB - DMR/analog channels - MotoTRBO does not support P25, hence this also does not.
+Radio Foundry DM32UV Zip Export to M XCTB - DMR/analog channels - M CPS does not support P25, hence this also does not.
+
 ## Trademarks & Disclaimer
-MOTOROLA, MOTO, MOTOROLA SOLUTIONS, and MOTOTRBO are trademarks or registered trademarks of Motorola Trademark Holdings, LLC and are used under license. All other trademarks are the property of their respective owners.
+MOTOROLA, MOTO, MOTOROLA SOLUTIONS, and MOTOTRBO are trademarks or registered trademarks of Motorola Trademark Holdings, LLC. All other trademarks are the property of their respective owners.
 
 This project is an independent work and is not affiliated with, endorsed by, or sponsored by Motorola Solutions, Inc.
 
