@@ -1,0 +1,45 @@
+You are going to convert a Radio Foundry CSV codeplug export into an existing Motorola MOTOTRBO CPS 2.0 XCTB archive, preserving every existing Motorola setting. Do not rely on any previous chat or memory; use only the files I attach and this prompt.
+
+ATTACHMENTS I WILL PROVIDE:
+1. Original, UNMODIFIED Motorola CPS 2.0 .xctb archive.
+2. Original Radio Foundry export .zip containing channels.csv, zones.csv, contacts.csv, rx-group-lists.csv (may also contain other CSVs).
+3. Motorola_RF_Public_Toolkit.zip, with scripts and the detailed conversion guide. Read README_START_HERE.md and docs/COMPLETE_CONVERSION_GUIDE.md before executing the merge.
+4. Optionally, a prior confirmed candidate merged archive and its QA reports for format/schema regression only. Do not import someone else's data from that archive.
+
+MISSION:
+Produce a NEW Motorola .xctb with RF channels, contacts, RX group lists, zones, zone-based roam lists, correct names, and all references while leaving every existing Motorola record intact. Preserve the input .xctb and RF .zip unmodified. Rebuild the actual encrypted XCTB container, not just the XML. Deliver candidate XCTB, audit report JSON, rename map CSV, channel-by-channel QA CSV, and HTML explorer. If CPS-level validation is unavailable, explicitly state so and ask me to verify it before writing a radio.
+
+FIRST: Do not guess field names. Use provided read-only decoder and script-built HTML explorer to inspect the source model's actual MatrixRadio XML and decompressed DBNode XML. Discover existing matching analog, digital, IPSC, RX group, contact, zone, and roam records to use as schema-correct clone templates. The DBNode is base64-encoded raw DEFLATE in MatrixRadio/WorkingCodeplug/Configuration/DBNodeCmpBytes. Read the toolkit guide.
+
+SOURCE RULES:
+- Ignore dtmf-contacts.csv and aprs.csv entirely.
+- RF contacts.csv -> Motorola PCRContacts. Ignore RF Number and Timeslot. Create contacts BEFORE RX groups or channel TX-contact references. Preserve ID and Call Type.
+- RF rx-group-lists.csv -> Motorola Digital RX Group List. Ignore RF Number. Resolve each member contact to its NEW Motorola UUID.
+- RF channels.csv: ignore Number, APRS, DMR ID, All Skip, Zone Skip, Tone Burst, No Beep, No Eco, Talker Alias TS1, Talker Alias TS2, Use Location, Latitude, Longitude, SFR, SFR A, SFR B, and RF Squelch. Preserve relevant other settings including Mode, RX/TX frequency, RX Only, VOX where supported, Timeout, Bandwidth, analog RX/TX TPL/DPL/CSQ, DMR color code, timeslot, TX contact, and RX group. Force all new channels to HIGH transmit power.
+- RF FM mode -> Motorola analog, with independent RX/TX tones. Blank=CSQ; numeric tone=TPL (CTCSS); DxxxN and DxxxI mean DPL normal/inverted. Use actual Motorola field combinations to represent each; don't set only a display field and forget its backing indices/mode fields.
+- RF DMR -> Motorola DMR with RX/TX frequency, Color Code, slot 1/2, TX contact and optional RX group. Resolve by UUID, not display name.
+- RF DMO means direct-mode flag. On 45x0, 65x0, and SLx models do NOT enable Extended Range Direct Mode. Never enable Extended Range Direct Mode if RX/TX differ, and never enable it unless the actual radio supports it. Plain simplex DMR with equal RX/TX is not synonymous with extended-range direct mode.
+- RF zones.csv -> Motorola Zone records and ZoneItem assignments. Create the zones, channels, and actual ZoneItem UUID references. Preserve original zone ordering and source membership ordering when importing.
+- RF Roaming=Yes from channels.csv: after zones are created, for EACH zone containing one or more Roaming=Yes digital channels, enable IPSC (IP Site Connect) on those channels, create a roam list named after that ZONE, add ONLY those channels' ZoneItems into that roam list, then round-robin back to those channel personalities and set Scan/Roam List to the new list UUID. Preserve all existing Motorola roam lists. If a single personality requires conflicting roam lists from multiple zones, STOP and report the ambiguity; never pick one silently.
+- Do not create scan lists unless there is a real source definition. If RF source contains separate scan-list definitions, preserve and remap their channel references. Never infer arbitrary scan membership from scan-related Boolean flags.
+
+COLLISIONS / RELATIONAL RENAMES:
+- If a RF contact, channel, zone, scan list, or roam list has the same name as an existing Motorola record of the corresponding kind, retain the Motorola original and suffix the NEW RF name with '-RF'. Enforce target-specific character limits; truncate any part of the base name needed to preserve the complete '-RF' suffix. Do not create any new duplicate names. For any renamed RF contact, update its RF RX groups and RF channel TX-contact pointers. For any renamed RF channel, update its RF zones, scan lists, and roam lists. For a renamed RF zone or list, update all its referring records. Build deterministic old-name->new-name->UUID maps in a dedicated pass before importing.
+
+EXCEPTIONS:
+- Do NOT assume any exclusions or frequency corrections for a new person's files. Build a preflight plan and flag out-of-band channels and suspicious values. Get operator authorization before omitting or changing frequencies. The historic reference example omitted one out-of-band channel and corrected two specifically authorized transmit frequencies, but these exceptions must NOT be applied blindly to other files.
+
+PROCESS (MANDATORY):
+A. Inventory/hash attachments; check zip CSV headers and counts; determine Motorola model/data-model, supported band, and protection mode.
+B. Run read-only decode and XML/DBNode validation; keep original unmodified. Generate searchable HTML via the provided script.
+C. Run rf_preflight.py and inspect every error, collision, reference, unsupported feature, and out-of-band setting. Do not proceed with errors.
+D. Build a dependency graph and maps. Create cloned schema-correct records in the order: contacts -> RX groups -> channel personalities -> zones/ZoneItems -> roam lists/RoamListItems -> backfill channel scan/roam refs; scan lists if their definitions exist.
+E. New Record UUIDs must be unique, including descendant records. Patch every DBRefField referencing renamed/rekeyed records. Preserve all unrelated Motorola settings and every original record. Do not invent feature entitlements or licensing.
+F. Serialize DBNode XML, compress it using raw DEFLATE (wbits=-15), Base64 into DBNodeCmpBytes, preserve the surrounding MatrixRadio structure and metadata, recalculate embedded XML SHA-256, GZIP + AES-CBC package into a NEW .xctb using xctb_roundtrip.py (default-protected only). Never overwrite original.
+G. Independently decrypt/verify the generated XCTB. Audit old-record preservation, UUID uniqueness, all group/contact/channel/zone/roam refs, counts, frequencies/tones/CC/slot, all RF rows imported or documented exceptions. Generate a per-channel QA CSV and rename/ref table.
+H. Run or ask me to run Motorola CPS 2.0's Open and configuration validation. Report CPS errors exactly; don't declare success merely from valid AES/checksum/XML. Do not program radio without explicit operator approval.
+I. Deliver new XCTB, companion QA files, HTML explorer, detailed changes and any unresolved issues. Clearly distinguish PASSED tests from NOT TESTED tests.
+
+If the toolkit does not contain a universal automated merger (it doesn't), IMPLEMENT the model-specific DBNode merge using the actual source's observed structure and verified templates, not a guess. Test against source and use the optional reference archive only for structural learning/format regression, not as a recipient of its original frequencies or secret IDs.
+
+Maintain progress updates. Do not omit required steps, don't make changes beyond the requested import, and don't ask for details already specified in uploaded files. These are configuration backups, not proof of feature entitlement or authorization.

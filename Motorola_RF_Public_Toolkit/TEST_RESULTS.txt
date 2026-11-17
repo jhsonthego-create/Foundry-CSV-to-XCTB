@@ -1,0 +1,28 @@
+Toolkit test record — 2026-11-17
+
+PUBLIC, SYNTHETIC TESTS:
+  python -m unittest discover -s tests -v
+  3/3 passed: synthetic XCTB decrypt/repack, corrupted ciphertext rejection,
+  and RF contact/channel collision + zone-based roaming dependency plan.
+
+PRIVATE REAL REFERENCE (tests performed without changing original files):
+  Original XCTB: AES/GZIP/XML hash/DBNode deflate verification PASS.
+  Merged XCTB: AES/GZIP/XML hash/DBNode deflate verification PASS.
+  Default-protected extract->repack->re-decrypt PASS.
+  RF preflight: 12 contacts, 1 RX group, 103 imported channels,
+                8 zones, 3 roam lists; no warnings/errors.
+  Independent structural audit: PASS.
+    Original UUID-bearing records 705; 704 unchanged exactly.
+    One expected changed record: enclosing parent container holding new RefSet children.
+    New UUID-bearing records: 267, no collisions.
+    All selected new links resolve; parent non-RefSet fields unchanged.
+  Merged count: 269 channels, 19 zones, 102 contacts, 2 RX groups,
+                6 roam lists, 7 scan lists.
+
+LIMITATIONS:
+  These tests prove wrapper and structural validity, not Motorola CPS semantic
+  compilation. No automated general-purpose RF→Motorola XML MERGER is included;
+  a new ChatGPT instance must implement a model-specific merge against its actual
+  input codeplug, using the guide and preflight plan. No radio write is claimed.
+
+NO real user files or private test outputs are included in the PUBLIC toolkit.

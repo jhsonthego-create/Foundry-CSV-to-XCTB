@@ -1,0 +1,14 @@
+This is a NEW, PUBLIC tutorial conversation, separate from any private codeplug conversion. Do NOT request or use my personal Motorola XCTB, Radio Foundry export ZIP, decrypted XML, private HTML, passwords, radio serials or other live configuration data in this chat.
+
+I am attaching Motorola_RF_Public_Toolkit_PUBLIC_20261117.zip. Read all the provided READMEs, `docs/COMPLETE_CONVERSION_GUIDE.md`, and the included scripts. Create a clear public-facing guide explaining how someone can run a SEPARATE PRIVATE ChatGPT conversion session by uploading:
+(1) their original unmodified Motorola CPS 2.0 .xctb;
+(2) their original Radio Foundry CSV export ZIP;
+(3) this public toolkit.
+
+Explain how to inspect/decrypt the default-protected XCTB, parse MatrixRadio + nested DBNodeCmpBytes, use the searchable HTML explorer, preflight all RF CSVs and naming collisions, build schema-specific DBNode records in dependency order (contacts, RX groups, channels, zones/ZoneItems, zone-named roam lists, channel backreferences), repack new XCTB with integrity checks, and run structural plus real CPS validation.
+
+Keep all original Motorola settings. Respect the toolkit's model limits and public/private data boundaries. Explain that the scripts include decoder, preflight planner, HTML explorer, repacker and auditor but NOT a universal automatic RF→Motorola XML merger; each private job must implement/test the actual model schema.
+
+Present only generic/synthetic examples. Provide a link to the public toolkit ZIP from the new conversation if the app supports the attachment, and recommend GitHub or an explicitly public Drive link for durable downloads. Do not imply an XCTB that passes checksum tests has passed Motorola CPS or safe radio-write checks.
+
+After this tutorial is complete and reviewed, I will use Share on THIS NEW CONVERSATION to create the public ChatGPT share link. Do not refer to or share any earlier private conversation.
